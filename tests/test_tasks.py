@@ -26,3 +26,15 @@ class TaskTestCase(unittest.TestCase):
         self.app.post('/tasks', json={'title': 'Delete Me'})
         res = self.app.delete('/tasks/1')
         self.assertEqual(res.status_code, 204)
+
+    def test_patch_update_title(self):
+        self.app.post('/tasks', json={'title': 'Original'})
+        res = self.app.patch('/tasks/1', json={'title': 'Patched Title'})
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('Patched Title', res.get_data(as_text=True))
+
+    def test_patch_with_no_valid_fields(self):
+        self.app.post('/tasks', json={'title': 'Keep Me'})
+        res = self.app.patch('/tasks/1', json={'invalid': 'nope'})
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('No valid fields', res.get_data(as_text=True))
